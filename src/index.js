@@ -3,8 +3,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
-import {withConfig, ConfigProvider} from './context';
-import {getRandomColor, parseSize} from './utils';
+import { withConfig, ConfigProvider } from './context';
+import { getRandomColor, parseSize } from './utils';
 import InternalState from './internal-state';
 
 import gravatarSource from './sources/Gravatar';
@@ -35,14 +35,14 @@ const SOURCES = [
 // Collect propTypes for each individual source
 const sourcePropTypes = SOURCES.reduce((r, s) => Object.assign(r, s.propTypes), {});
 
-export {getRandomColor} from './utils';
-export {ConfigProvider} from './context';
+export { getRandomColor } from './utils';
+export { ConfigProvider } from './context';
 
 function matchSource(Source, props, cb) {
     const { cache } = props;
     const instance = new Source(props);
 
-    if(!instance.isCompatible(props))
+    if (!instance.isCompatible(props))
         return cb();
 
     instance.get((state) => {
@@ -50,7 +50,7 @@ function matchSource(Source, props, cb) {
             state.hasOwnProperty('src') &&
             cache.hasSourceFailedBefore(state.src);
 
-        if(!failedBefore && state) {
+        if (!failedBefore && state) {
             cb(state);
         } else {
             cb();
@@ -59,7 +59,7 @@ function matchSource(Source, props, cb) {
 }
 
 export
-class Avatar extends PureComponent {
+    class Avatar extends PureComponent {
 
     static displayName = 'Avatar'
 
@@ -141,11 +141,11 @@ class Avatar extends PureComponent {
             return;
 
         // Mark img source as failed for future reference
-        if( errEvent && errEvent.type === 'error' )
+        if (errEvent && errEvent.type === 'error')
             cache.sourceFailed(errEvent.target.src);
 
         const pointer = internal.sourcePointer;
-        if(SOURCES.length === pointer)
+        if (SOURCES.length === pointer)
             return;
 
         const source = SOURCES[pointer];
@@ -229,6 +229,44 @@ class Avatar extends PureComponent {
         );
     }
 
+    _renderAsDiv() {
+        const { className, round, unstyled, name, value } = this.props;
+        const { internal } = this.state;
+        const size = parseSize(this.props.size);
+        const alt = name || value;
+
+        const imageStyle = unstyled
+            ? null
+            : {
+                maxWidth: "100%",
+                width: size.str,
+                height: size.str,
+                borderRadius: round === true ? "100%" : round
+            };
+
+        return (
+            <div
+                className={className + " sb-avatar__image"}
+                width={size.str}
+                height={size.str}
+                style={imageStyle}
+                alt={alt}
+                onError={internal && internal.fetch}
+            >
+                <div
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        backgroundSize: "cover",
+                        backgroundImage: `url(${this.state.src})`,
+                        backgroundPosition: "50% 50%",
+                        borderRadius: round === true ? "100%" : round
+                    }}
+                />
+            </div>
+        );
+    }
+
     _renderAsText() {
         const { className, round, unstyled } = this.props;
         const size = parseSize(this.props.size);
@@ -284,7 +322,7 @@ class Avatar extends PureComponent {
             ...style
         };
 
-        const classNames = [ className, 'sb-avatar' ];
+        const classNames = [className, 'sb-avatar'];
 
         if (sourceName) {
             const source = sourceName.toLowerCase()
@@ -297,7 +335,7 @@ class Avatar extends PureComponent {
             <div className={classNames.join(' ')}
                 onClick={onClick}
                 style={hostStyle}>
-                {src ? this._renderAsImage() : this._renderAsText()}
+                {src ? this._renderAsDiv() : this._renderAsText()}
             </div>
         );
     }
