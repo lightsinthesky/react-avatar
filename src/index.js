@@ -246,7 +246,6 @@ export
 
         return (
             <div
-                className={className + " sb-avatar__image"}
                 width={size.str}
                 height={size.str}
                 style={imageStyle}
