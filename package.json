@@ -18,6 +18,7 @@
     "serve": "npm -s run dev",
     "test": "npm -s run test:lint",
     "test:lint": "eslint src",
+    "postinstall": "npm -s run build",
     "postpublish": "npm -s run publish:docs",
     "publish:docs": "npm -s run build:demo && gh-pages -d build"
   },
